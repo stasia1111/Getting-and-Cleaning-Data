@@ -1,5 +1,5 @@
 library(dplyr)
-
+library(data.table)
 
 setwd("C:/Users/Joanna/Desktop/coursera tidy data/assessment")
 testData <- read.table("./UCI HAR Dataset/test/X_test.txt", quote="\"")
@@ -50,10 +50,8 @@ colnames(testData_act)<-colnames(trainData_act)<-c("Activity")
 colnames(testData_sub)<-colnames(trainData_sub)<-c("Subject")
 
 ################5
-head(complete2)
-r1<-group_by(complete2, Activity, Subject) %>% do(my.mean=apply(.,2, mean, na.rm = TRUE))
-r2<-group_by(complete2, Activity) %>% do(my.mean1=apply(.,2, function(x) mean(as.numeric(x), na.rm = TRUE)))
-r3<-group_by(complete2, Subject) %>% do(my.mean1=apply(.,2, mean))
-
-write.csv(complete2, "complete2.csv")
-head(complete2)
+library(data.table)
+colnames(complete2) <- c(colnames(complete), "Activity", "Subject")
+DT <- data.table(complete2)
+tidy<-DT[,lapply(.SD,mean),by="Activity,Subject"]
+write.table(tidy,file="tidy.txt",sep=",",row.names = FALSE)
